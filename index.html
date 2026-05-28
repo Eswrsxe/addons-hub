@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RatoPlay.br | Hub de Addons</title>
+    <style>
+        :root {
+            --bg: #0f1115;
+            --bg-2: #151922;
+            --card: rgba(24, 28, 38, 0.9);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text: #f4f7fb;
+            --muted: #a9b3c1;
+            --accent: #5865f2;
+            --success: #23a55a;
+            --success-hover: #1b7f45;
+            --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Inter, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top, rgba(88, 101, 242, 0.18), transparent 35%),
+                radial-gradient(circle at bottom right, rgba(35, 165, 90, 0.10), transparent 25%),
+                linear-gradient(180deg, var(--bg), var(--bg-2));
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 28px 18px 40px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 28px;
+            padding: 28px 18px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            color: var(--muted);
+            font-size: 13px;
+            margin-bottom: 14px;
+            backdrop-filter: blur(10px);
+        }
+
+        header h1 {
+            font-size: clamp(28px, 4vw, 44px);
+            line-height: 1.05;
+            margin-bottom: 10px;
+            letter-spacing: -0.03em;
+        }
+
+        header h1 span {
+            color: var(--accent);
+        }
+
+        header p {
+            color: var(--muted);
+            font-size: 15px;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .top-bar {
+            display: flex;
+            gap: 12px;
+            margin: 8px 0 24px;
+            flex-wrap: wrap;
+        }
+
+        .top-bar input,
+        .top-bar select {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 14px;
+            outline: none;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+        }
+
+        .top-bar input {
+            flex: 1;
+            min-width: 220px;
+        }
+
+        .top-bar select {
+            cursor: pointer;
+            min-width: 170px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 18px;
+            margin-top: 18px;
+        }
+
+        .card {
+            --accent-card: #5865f2;
+            position: relative;
+            border-radius: 22px;
+            padding: 1px;
+            background: linear-gradient(
+                135deg,
+                var(--accent-card),
+                rgba(255, 255, 255, 0.06) 55%,
+                rgba(255, 255, 255, 0.04)
+            );
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: transform 0.22s ease, box-shadow 0.22s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 22px 60px rgba(0, 0, 0, 0.45);
+        }
+
+        .card-inner {
+            height: 100%;
+            border-radius: 21px;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02)),
+                var(--card);
+            border: 1px solid var(--card-border);
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            backdrop-filter: blur(12px);
+        }
+
+        /* --- NOVO ESTILO DO CABEÇALHO DO CARD COM IMAGEM --- */
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .addon-img {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            object-fit: cover;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            flex-shrink: 0; /* Impede que a imagem encolha */
+        }
+
+        .title {
+            font-size: 17px;
+            font-weight: 800;
+            line-height: 1.3;
+            letter-spacing: -0.02em;
+        }
+        /* ---------------------------------------------------- */
+
+        .download {
+            margin-top: auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: linear-gradient(180deg, rgba(35, 165, 90, 1), rgba(28, 135, 73, 1));
+            color: #fff;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 14px;
+            transition: transform 0.2s ease, filter 0.2s ease, background 0.2s ease;
+            box-shadow: 0 10px 24px rgba(35, 165, 90, 0.22);
+        }
+
+        .download:hover {
+            transform: scale(1.02);
+            filter: brightness(1.05);
+            background: linear-gradient(180deg, var(--success), var(--success-hover));
+        }
+
+        footer {
+            text-align: center;
+            color: var(--muted);
+            font-size: 12px;
+            padding: 28px 10px 8px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 18px 14px 34px;
+            }
+
+            header {
+                padding: 18px 8px 22px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .top-bar {
+                flex-direction: column;
+            }
+
+            .top-bar select,
+            .top-bar input {
+                width: 100%;
+                min-width: unset;
+            }
+            .discord-banner {
+                margin: 18px auto 0;
+                display: inline-flex;
+                align-items: center;
+                gap: 12px;
+                padding: 12px 18px;
+                background: linear-gradient(
+                    135deg,
+                    rgba(88, 101, 242, 0.22),
+                    rgba(255,255,255,0.04)
+                );
+                border: 1px solid rgba(255,255,255,0.08);
+                border-radius: 18px;
+                text-decoration: none;
+                color: white;
+                font-weight: 700;
+                font-size: 15px;
+                transition: 0.25s ease;
+                box-shadow:
+                    0 0 20px rgba(88,101,242,0.18),
+                    0 10px 35px rgba(0,0,0,0.25);
+                backdrop-filter: blur(10px);
+            }
+
+            .discord-banner:hover {
+                transform: translateY(-3px) scale(1.02);
+                box-shadow:
+                    0 0 28px rgba(88,101,242,0.35),
+                    0 14px 40px rgba(0,0,0,0.35);
+                border-color: rgba(88,101,242,0.35);
+            }
+
+            .discord-banner img {
+                width: 42px;
+                height: 42px;
+                border-radius: 14px;
+                object-fit: cover;
+                box-shadow: 0 0 12px rgba(88,101,242,0.35);
+            }
+
+            .discord-banner span {
+                letter-spacing: 0.4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="badge">🎮 RatoPlay.br • Central de Addons</div>
+            <h1>Hub de <span>Addons</span></h1>
+            <a 
+                href="https://discord.gg/EHprj3HvCM" 
+                target="_blank" 
+                class="discord-banner"
+            >
+                <img 
+                    src="https://cdn.discordapp.com/icons/1442892294272454779/38daa2edb9ee7f3becfed342d80fc16d.png?size=2048" 
+                    alt="Servidor Discord"
+                >
+                <span>👑🐀╵𝐓𝐨𝐜𝐚 𝐝𝐨𝐬 𝐑𝐚𝐭𝐨𝐬</span>
+            </a>
+        </header>
+
+        <div class="top-bar">
+            <input type="text" id="searchInput" placeholder="Pesquisar addon..." />
+            <select id="sortSelect">
+                <option value="az">Organizar: A → Z</option>
+                <option value="za">Organizar: Z → A</option>
+            </select>
+        </div>
+
+        <main class="grid" id="addonsGrid">
+            <!-- Render Dragon -->
+            <article class="card" style="--accent-card:#ef4444;">
+                <div class="card-inner">
+                    <div class="card-header">
+                        <img src="Fps.jpg" alt="Render Dragon" class="addon-img" />
+                        <div class="title">Render Dragon Optimizer</div>
+                    </div>
+                    <a class="download" href="https://www.curseforge.com/minecraft-bedrock/texture-packs/fps-optimizer-fps-boost/gallery" target="_blank">Baixar .mcpack</a>
+                </div>
+            </article>
+
+            <!-- Raiyon's Saturation -->
+            <article class="card" style="--accent-card:#eab308;">
+                <div class="card-inner">
+                    <div class="card-header">
+                        <img src="Rrr.png" alt="Raiyon's Saturation" class="addon-img" />
+                        <div class="title">Raiyon's Java Saturation</div>
+                    </div>
+                    <a class="download" href="https://www.curseforge.com/minecraft-bedrock/addons/raiyons-java-saturation-regeneration/files/all" target="_blank">Baixar na CurseForge</a>
+                </div>
+            </article>
+
+            <!-- Mini Tools -->
+            <article class="card" style="--accent-card:#a855f7;">
+                <div class="card-inner">
+                    <div class="card-header">
+                        <img src="Espada.png" alt="Mini Tools" class="addon-img" />
+                        <div class="title">Mini Tools Bedrock</div>
+                    </div>
+                    <a class="download" href="https://www.curseforge.com/minecraft-bedrock/texture-packs/tiny-tools-made-by-jahirtrap-ported-to-bedrock-by" target="_blank">Baixar na CurseForge</a>
+                </div>
+            </article>
+
+            <!-- No Pumpkin Blur -->
+            <article class="card" style="--accent-card:#f97316;">
+                <div class="card-inner">
+                    <div class="card-header">
+                        <img src="Abobora.jpg" alt="No Pumpkin Blur" class="addon-img" />
+                        <div class="title">Textura Abóbora Blur OFF</div>
+                    </div>
+                    <a class="download" href="https://www.curseforge.com/minecraft-bedrock/texture-packs/no-pumpkin-blur" target="_blank">Baixar na CurseForge</a>
+                </div>
+            </article>
+
+            <!-- Night Vision -->
+            <article class="card" style="--accent-card:#3b82f6;">
+                <div class="card-inner">
+                    <div class="card-header">
+                        <img src="vibrant-visuals.jpg" alt="Night Vision" class="addon-img" />
+                        <div class="title">Night Vision Bedrock</div>
+                    </div>
+                    <a class="download" href="https://www.mediafire.com/file/dp9btmaijrhdlbp/Toggle-Night-Vision-Texture-Pack-MCPE-1.21.mcpack/file" target="_blank">Baixar .mcpack</a>
+                </div>
+            </article>
+
+            <!-- No Particles -->
+            <article class="card" style="--accent-card:#dc2626;">
+                <div class="card-inner">
+                    <div class="card-header">
+                        <img src="No.jpg" alt="No Particles" class="addon-img" />
+                        <div class="title">Textura Sem Partículas</div>
+                    </div>
+                    <a class="download" href="https://www.curseforge.com/minecraft-bedrock/texture-packs/no-particles-fps?utm_source=chatgpt.com" target="_blank">Baixar na CurseForge</a>
+                </div>
+            </article>
+
+            <!-- Sodium Bedrock -->
+            <article class="card" style="--accent-card:#22c55e;">
+                <div class="card-inner">
+                    <div class="card-header">
+                        <img src="Ss.jpg" alt="Sodium Bedrock" class="addon-img" />
+                        <div class="title">Sodium Bedrock</div>
+                    </div>
+                    <a class="download" href="https://www.mediafire.com/file/xi25efitxgxyag8/Sodium_Mod_V6_ByLordKennMC.mcpack/file" target="_blank">Baixar .mcpack</a>
+                </div>
+            </article>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 RatoPlay.br • Todos os direitos reservados.</p>
+        </footer>
+    </div>
+
+    <script>
+        const grid = document.getElementById("addonsGrid");
+        const sortSelect = document.getElementById("sortSelect");
+        const searchInput = document.getElementById("searchInput");
+
+        function sortCards(order) {
+            const cards = Array.from(grid.querySelectorAll(".card"));
+
+            cards.sort((a, b) => {
+                const titleA = a.querySelector(".title").textContent.trim().toLowerCase();
+                const titleB = b.querySelector(".title").textContent.trim().toLowerCase();
+
+                return order === "az"
+                    ? titleA.localeCompare(titleB, "pt-BR")
+                    : titleB.localeCompare(titleA, "pt-BR");
+            });
+
+            cards.forEach(card => grid.appendChild(card));
+        }
+
+        function applySearch() {
+            const query = searchInput.value.trim().toLowerCase();
+            const cards = grid.querySelectorAll(".card");
+
+            cards.forEach(card => {
+                const title = card.querySelector(".title").textContent.toLowerCase();
+                card.style.display = title.includes(query) ? "block" : "none";
+            });
+        }
+
+        sortSelect.addEventListener("change", () => {
+            sortCards(sortSelect.value);
+            applySearch();
+        });
+
+        searchInput.addEventListener("input", applySearch);
+
+        sortCards("az");
+        applySearch();
+    </script>
+</body>
+</html>
