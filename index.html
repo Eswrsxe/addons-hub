@@ -165,13 +165,12 @@
         import { getDatabase, ref, onValue, set, push, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-    <!-- SCRIPTS DO FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getDatabase, ref, onValue, set, push, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-        // SUAS CONFIGURAÇÕES REAIS DO FIREBASE
+        // Suas chaves do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBpuO5PATbxK-ZlIKh859G02JXnEtTyAcI",
             authDomain: "hub-addon.firebaseapp.com",
@@ -180,7 +179,6 @@
             storageBucket: "hub-addon.firebasestorage.app",
             messagingSenderId: "226204582530",
             appId: "1:226204582530:web:076e068b4aa50a46466a9b"
-            // measurementId foi omitido pois não usaremos o Analytics neste escopo básico
         };
 
         const app = initializeApp(firebaseConfig);
@@ -200,7 +198,7 @@
         let currentUser = null;
         let addonsGlobais = {}; 
 
-        // 1. MONITORAR AUTENTICAÇÃO (Sessão Salva)
+        // 1. MONITORAR AUTENTICAÇÃO
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
@@ -213,7 +211,7 @@
             }
         });
 
-        // 2. LER DADOS DO BANCO (Público)
+        // 2. LER DADOS DO BANCO
         onValue(addonsRef, (snapshot) => {
             addonsGrid.innerHTML = ""; 
             adminList.innerHTML = "<h3>Addons Cadastrados:</h3>";
@@ -256,9 +254,9 @@
         // 3. LÓGICA DE ABRIR MODAIS
         headerTrigger.addEventListener('click', () => {
             if (currentUser) {
-                adminModal.style.display = "flex"; // Se logado, abre ADM
+                adminModal.style.display = "flex";
             } else {
-                loginModal.style.display = "flex"; // Se não, pede login
+                loginModal.style.display = "flex";
             }
         });
 
@@ -274,7 +272,7 @@
             signInWithEmailAndPassword(auth, email, pass)
                 .then(() => {
                     loginModal.style.display = "none";
-                    adminModal.style.display = "flex"; // Login sucesso, já abre o painel
+                    adminModal.style.display = "flex";
                     document.getElementById('loginForm').reset();
                 })
                 .catch((error) => {
@@ -291,7 +289,7 @@
             });
         });
 
-        // 6. SALVAR OU EDITAR ADDON (Privado - Exige Login)
+        // 6. SALVAR OU EDITAR ADDON
         document.getElementById('addonForm').addEventListener('submit', (e) => {
             e.preventDefault();
             if(!currentUser) return alert("Você precisa estar logado!");
@@ -322,8 +320,8 @@
                 div.innerHTML = `
                     <span style="font-size: 14px;">${addon.nome}</span>
                     <div class="admin-item-actions">
-                        <button class="btn btn-edit" onclick="editarAddon('${id}')">Editar</button>
-                        <button class="btn btn-delete" onclick="excluirAddon('${id}')">X</button>
+                        <button type="button" class="btn btn-edit" onclick="editarAddon('${id}')">Editar</button>
+                        <button type="button" class="btn btn-delete" onclick="excluirAddon('${id}')">X</button>
                     </div>
                 `;
                 adminList.appendChild(div);
