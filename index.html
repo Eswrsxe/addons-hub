@@ -57,7 +57,7 @@
 
         footer { text-align: center; color: var(--muted); font-size: 12px; padding: 28px 10px 8px; }
 
-        /* --- ESTILOS DO PAINEL ADM (MODAL) --- */
+        /* --- ESTILOS DOS MODAIS (LOGIN E ADM) --- */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
         .modal { background: var(--bg-2); border: 1px solid var(--card-border); border-radius: 20px; width: 100%; max-width: 500px; padding: 24px; max-height: 90vh; overflow-y: auto; }
         .modal h2 { margin-bottom: 20px; color: var(--accent); }
@@ -69,6 +69,7 @@
         .btn { padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; color: white; transition: 0.2s; }
         .btn-save { background: var(--success); width: 100%; margin-top: 10px; }
         .btn-cancel { background: #ef4444; width: 100%; margin-top: 10px; }
+        .btn-logout { background: #313338; width: 100%; margin-top: 10px; border: 1px solid var(--card-border); }
         .btn-edit { background: var(--accent); padding: 6px 12px; font-size: 12px; border-radius: 6px;}
         .btn-delete { background: #ef4444; padding: 6px 12px; font-size: 12px; border-radius: 6px;}
         
@@ -82,7 +83,7 @@
         <header id="headerTrigger">
             <div class="badge">🎮 RatoPlay.br • Central de Addons</div>
             <h1>Hub de <span>Addons</span></h1>
-            <p>Clique aqui para acessar a área administrativa (Necessário PIN).</p>
+            <p id="headerStatus">Clique aqui para acessar a área administrativa.</p>
         </header>
 
         <div class="top-bar">
@@ -96,6 +97,24 @@
         <footer>
             <p>&copy; 2026 RatoPlay.br • Todos os direitos reservados.</p>
         </footer>
+    </div>
+
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal">
+            <h2>🔒 Acesso Restrito</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>E-mail de Administrador</label>
+                    <input type="email" id="loginEmail" required placeholder="admin@email.com" />
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="loginPassword" required placeholder="Sua senha" />
+                </div>
+                <button type="submit" class="btn btn-save">Fazer Login</button>
+                <button type="button" class="btn btn-cancel" id="closeLogin">Cancelar</button>
+            </form>
+        </div>
     </div>
 
     <div class="modal-overlay" id="adminModal">
@@ -116,7 +135,7 @@
                 </div>
                 
                 <div class="form-group">
-                    <label>Link de Download (Mediafire, CurseForge, etc)</label>
+                    <label>Link de Download</label>
                     <input type="url" id="addonLink" required placeholder="https://..." />
                 </div>
                 
@@ -132,78 +151,86 @@
 
                 <button type="submit" class="btn btn-save" id="saveBtn">Adicionar/Salvar Addon</button>
                 <button type="button" class="btn btn-cancel" id="closeAdmin">Fechar Painel</button>
+                <button type="button" class="btn btn-logout" id="logoutBtn">Sair da Conta</button>
             </form>
 
             <div class="admin-list" id="adminList">
                 <h3>Addons Cadastrados:</h3>
-                </div>
+            </div>
         </div>
     </div>
 
     <script type="module">
-        // Importa as bibliotecas do Firebase V9
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getDatabase, ref, onValue, set, push, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
         // ⚠️ COLOQUE SUAS CREDENCIAIS DO FIREBASE AQUI
         const firebaseConfig = {
-            apiKey: "SUA_API_KEY_AQUI",
+            apiKey: "SUA_API_KEY",
             authDomain: "SEU_PROJETO.firebaseapp.com",
             databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
             projectId: "SEU_PROJETO",
             storageBucket: "SEU_PROJETO.appspot.com",
-            messagingSenderId: "SEU_SENDER_ID",
+            messagingSenderId: "SEU_SENDER",
             appId: "SEU_APP_ID"
         };
 
-        // Inicializa o Firebase
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        const auth = getAuth(app);
         const addonsRef = ref(db, 'addons');
 
-        // Referências do DOM
+        // Referências DOM
         const addonsGrid = document.getElementById('addonsGrid');
         const headerTrigger = document.getElementById('headerTrigger');
+        const headerStatus = document.getElementById('headerStatus');
         const adminModal = document.getElementById('adminModal');
-        const closeAdmin = document.getElementById('closeAdmin');
-        const addonForm = document.getElementById('addonForm');
-        const searchInput = document.getElementById('searchInput');
+        const loginModal = document.getElementById('loginModal');
         const adminList = document.getElementById('adminList');
+        const searchInput = document.getElementById('searchInput');
 
-        const PIN_CORRETO = "gUA@_2468-";
-        let addonsGlobais = {}; // Salva os dados na memória para pesquisa
+        let currentUser = null;
+        let addonsGlobais = {}; 
 
-        // 1. LER DADOS DO FIREBASE EM TEMPO REAL
+        // 1. MONITORAR AUTENTICAÇÃO (Sessão Salva)
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                headerStatus.innerHTML = `🟢 Logado como ADM (${user.email}). Clique para abrir painel.`;
+                headerStatus.style.color = "var(--success)";
+            } else {
+                currentUser = null;
+                headerStatus.innerHTML = "Clique aqui para acessar a área administrativa.";
+                headerStatus.style.color = "var(--muted)";
+            }
+        });
+
+        // 2. LER DADOS DO BANCO (Público)
         onValue(addonsRef, (snapshot) => {
             addonsGrid.innerHTML = ""; 
             adminList.innerHTML = "<h3>Addons Cadastrados:</h3>";
             addonsGlobais = {};
 
             const data = snapshot.val();
-            
             if (data) {
                 addonsGlobais = data;
                 renderizarGrid(data);
                 renderizarListaAdmin(data);
             } else {
-                addonsGrid.innerHTML = "<p style='text-align:center; width:100%;'>Nenhum addon encontrado. Adicione pelo Painel ADM!</p>";
+                addonsGrid.innerHTML = "<p style='text-align:center; width:100%;'>Nenhum addon encontrado.</p>";
             }
         });
 
-        // 2. FUNÇÃO PARA RENDERIZAR OS CARDS NO SITE
         function renderizarGrid(data, filtro = "") {
             addonsGrid.innerHTML = "";
-            
             Object.keys(data).forEach(id => {
                 const addon = data[id];
-                
-                // Filtro de pesquisa
                 if (filtro && !addon.nome.toLowerCase().includes(filtro.toLowerCase())) return;
 
                 const card = document.createElement('article');
                 card.className = "card";
                 card.style.setProperty('--accent-card', addon.cor);
-                
                 card.innerHTML = `
                     <div class="card-inner">
                         <div class="card-header">
@@ -217,52 +244,69 @@
             });
         }
 
-        // 3. PESQUISA
-        searchInput.addEventListener("input", (e) => {
-            renderizarGrid(addonsGlobais, e.target.value);
-        });
+        searchInput.addEventListener("input", (e) => renderizarGrid(addonsGlobais, e.target.value));
 
-        // 4. ABRIR PAINEL ADM (COM SENHA)
+        // 3. LÓGICA DE ABRIR MODAIS
         headerTrigger.addEventListener('click', () => {
-            const pinDigitado = prompt("Digite o PIN para acessar o painel de Administrador:");
-            if (pinDigitado === PIN_CORRETO) {
-                adminModal.style.display = "flex";
-                limparFormulario();
-            } else if (pinDigitado !== null) {
-                alert("PIN Incorreto!");
+            if (currentUser) {
+                adminModal.style.display = "flex"; // Se logado, abre ADM
+            } else {
+                loginModal.style.display = "flex"; // Se não, pede login
             }
         });
 
-        closeAdmin.addEventListener('click', () => {
-            adminModal.style.display = "none";
+        document.getElementById('closeLogin').addEventListener('click', () => loginModal.style.display = "none");
+        document.getElementById('closeAdmin').addEventListener('click', () => adminModal.style.display = "none");
+
+        // 4. LÓGICA DE LOGIN
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPassword').value;
+            
+            signInWithEmailAndPassword(auth, email, pass)
+                .then(() => {
+                    loginModal.style.display = "none";
+                    adminModal.style.display = "flex"; // Login sucesso, já abre o painel
+                    document.getElementById('loginForm').reset();
+                })
+                .catch((error) => {
+                    alert("Erro ao fazer login. Verifique e-mail e senha.");
+                    console.error(error);
+                });
         });
 
-        // 5. SALVAR OU EDITAR ADDON NO FIREBASE
-        addonForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const id = document.getElementById('addonId').value;
-            const nome = document.getElementById('addonName').value;
-            const img = document.getElementById('addonImg').value;
-            const link = document.getElementById('addonLink').value;
-            const btnNome = document.getElementById('addonBtnName').value;
-            const cor = document.getElementById('addonColor').value;
+        // 5. LÓGICA DE LOGOUT
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            signOut(auth).then(() => {
+                adminModal.style.display = "none";
+                alert("Você saiu da conta ADM com sucesso.");
+            });
+        });
 
-            const novoAddon = { nome, img, link, btnNome, cor };
+        // 6. SALVAR OU EDITAR ADDON (Privado - Exige Login)
+        document.getElementById('addonForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if(!currentUser) return alert("Você precisa estar logado!");
+
+            const id = document.getElementById('addonId').value;
+            const novoAddon = {
+                nome: document.getElementById('addonName').value,
+                img: document.getElementById('addonImg').value,
+                link: document.getElementById('addonLink').value,
+                btnNome: document.getElementById('addonBtnName').value,
+                cor: document.getElementById('addonColor').value
+            };
 
             if (id) {
-                // Atualiza existente
-                set(ref(db, 'addons/' + id), novoAddon);
-                alert("Addon atualizado com sucesso!");
+                set(ref(db, 'addons/' + id), novoAddon).then(() => alert("Atualizado!")).catch(e => alert("Erro: " + e.message));
             } else {
-                // Cria novo (gera ID automático)
-                push(addonsRef, novoAddon);
-                alert("Novo Addon adicionado!");
+                push(addonsRef, novoAddon).then(() => alert("Adicionado!")).catch(e => alert("Erro: " + e.message));
             }
             limparFormulario();
         });
 
-        // 6. RENDERIZAR LISTA DENTRO DO PAINEL ADM PARA EDITAR/EXCLUIR
+        // 7. RENDERIZAR LISTA NO PAINEL ADM
         function renderizarListaAdmin(data) {
             Object.keys(data).forEach(id => {
                 const addon = data[id];
@@ -279,7 +323,6 @@
             });
         }
 
-        // Funções globais atreladas ao window para funcionar com type="module"
         window.editarAddon = function(id) {
             const addon = addonsGlobais[id];
             document.getElementById('addonId').value = id;
@@ -292,8 +335,9 @@
         };
 
         window.excluirAddon = function(id) {
+            if(!currentUser) return alert("Ação negada.");
             if(confirm("Tem certeza que deseja excluir este addon?")) {
-                remove(ref(db, 'addons/' + id));
+                remove(ref(db, 'addons/' + id)).catch(e => alert("Erro: " + e.message));
             }
         };
 
