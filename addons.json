@@ -1,0 +1,53 @@
+{
+  "addons": {
+    "addon1": {
+      "nome": "Render Dragon Optimizer",
+      "link": "https://www.curseforge.com/minecraft-bedrock/texture-packs/fps-optimizer-fps-boost/gallery",
+      "btnNome": "Baixar .mcpack",
+      "cor": "#ef4444",
+      "img": "https://placehold.co/128x128/1e1e24/a9b3c1?text=IMG"
+    },
+    "addon2": {
+      "nome": "Raiyon's Java Saturation",
+      "link": "https://www.curseforge.com/minecraft-bedrock/addons/raiyons-java-saturation-regeneration/files/all",
+      "btnNome": "Baixar na CurseForge",
+      "cor": "#eab308",
+      "img": "https://placehold.co/128x128/1e1e24/a9b3c1?text=IMG"
+    },
+    "addon3": {
+      "nome": "Mini Tools Bedrock",
+      "link": "https://www.curseforge.com/minecraft-bedrock/texture-packs/tiny-tools-made-by-jahirtrap-ported-to-bedrock-by",
+      "btnNome": "Baixar na CurseForge",
+      "cor": "#a855f7",
+      "img": "https://placehold.co/128x128/1e1e24/a9b3c1?text=IMG"
+    },
+    "addon4": {
+      "nome": "Textura Abóbora Blur OFF",
+      "link": "https://www.curseforge.com/minecraft-bedrock/texture-packs/no-pumpkin-blur",
+      "btnNome": "Baixar na CurseForge",
+      "cor": "#f97316",
+      "img": "https://placehold.co/128x128/1e1e24/a9b3c1?text=IMG"
+    },
+    "addon5": {
+      "nome": "Night Vision Bedrock",
+      "link": "https://www.mediafire.com/file/dp9btmaijrhdlbp/Toggle-Night-Vision-Texture-Pack-MCPE-1.21.mcpack/file",
+      "btnNome": "Baixar .mcpack",
+      "cor": "#3b82f6",
+      "img": "https://placehold.co/128x128/1e1e24/a9b3c1?text=IMG"
+    },
+    "addon6": {
+      "nome": "Textura Sem Partículas",
+      "link": "https://www.curseforge.com/minecraft-bedrock/texture-packs/no-particles-fps?utm_source=chatgpt.com",
+      "btnNome": "Baixar na CurseForge",
+      "cor": "#dc2626",
+      "img": "https://placehold.co/128x128/1e1e24/a9b3c1?text=IMG"
+    },
+    "addon7": {
+      "nome": "Sodium Bedrock",
+      "link": "https://www.mediafire.com/file/xi25efitxgxyag8/Sodium_Mod_V6_ByLordKennMC.mcpack/file",
+      "btnNome": "Baixar .mcpack",
+      "cor": "#22c55e",
+      "img": "https://placehold.co/128x128/1e1e24/a9b3c1?text=IMG"
+    }
+  }
+}
