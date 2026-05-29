@@ -31,7 +31,6 @@
 
         .container { max-width: 1200px; margin: 0 auto; padding: 28px 18px 40px; }
 
-        /* HEADER CLICÁVEL PARA ADM */
         header { text-align: center; margin-bottom: 28px; padding: 28px 18px; cursor: pointer; transition: 0.2s; }
         header:hover { opacity: 0.8; }
         
@@ -57,7 +56,6 @@
 
         footer { text-align: center; color: var(--muted); font-size: 12px; padding: 28px 10px 8px; }
 
-        /* --- ESTILOS DOS MODAIS (LOGIN E ADM) --- */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
         .modal { background: var(--bg-2); border: 1px solid var(--card-border); border-radius: 20px; width: 100%; max-width: 500px; padding: 24px; max-height: 90vh; overflow-y: auto; }
         .modal h2 { margin-bottom: 20px; color: var(--accent); }
@@ -165,12 +163,7 @@
         import { getDatabase, ref, onValue, set, push, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getDatabase, ref, onValue, set, push, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-        // Suas chaves do Firebase
+        // CONFIGURAÇÕES DO FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyBpuO5PATbxK-ZlIKh859G02JXnEtTyAcI",
             authDomain: "hub-addon.firebaseapp.com",
@@ -186,7 +179,6 @@
         const auth = getAuth(app);
         const addonsRef = ref(db, 'addons');
 
-        // Referências DOM
         const addonsGrid = document.getElementById('addonsGrid');
         const headerTrigger = document.getElementById('headerTrigger');
         const headerStatus = document.getElementById('headerStatus');
@@ -198,11 +190,10 @@
         let currentUser = null;
         let addonsGlobais = {}; 
 
-        // 1. MONITORAR AUTENTICAÇÃO
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
-                headerStatus.innerHTML = `🟢 Logado como ADM (${user.email}). Clique para abrir painel.`;
+                headerStatus.innerHTML = "🟢 Logado como ADM (" + user.email + "). Clique para abrir painel.";
                 headerStatus.style.color = "var(--success)";
             } else {
                 currentUser = null;
@@ -211,7 +202,6 @@
             }
         });
 
-        // 2. LER DADOS DO BANCO
         onValue(addonsRef, (snapshot) => {
             addonsGrid.innerHTML = ""; 
             adminList.innerHTML = "<h3>Addons Cadastrados:</h3>";
@@ -223,7 +213,7 @@
                 renderizarGrid(data);
                 renderizarListaAdmin(data);
             } else {
-                addonsGrid.innerHTML = "<p style='text-align:center; width:100%;'>Nenhum addon encontrado.</p>";
+                addonsGrid.innerHTML = "<p style='text-align:center; width:100%; color:gray;'>Nenhum addon encontrado. Clique acima e faça login para adicionar!</p>";
             }
         });
 
@@ -251,7 +241,6 @@
 
         searchInput.addEventListener("input", (e) => renderizarGrid(addonsGlobais, e.target.value));
 
-        // 3. LÓGICA DE ABRIR MODAIS
         headerTrigger.addEventListener('click', () => {
             if (currentUser) {
                 adminModal.style.display = "flex";
@@ -263,7 +252,6 @@
         document.getElementById('closeLogin').addEventListener('click', () => loginModal.style.display = "none");
         document.getElementById('closeAdmin').addEventListener('click', () => adminModal.style.display = "none");
 
-        // 4. LÓGICA DE LOGIN
         document.getElementById('loginForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
@@ -281,7 +269,6 @@
                 });
         });
 
-        // 5. LÓGICA DE LOGOUT
         document.getElementById('logoutBtn').addEventListener('click', () => {
             signOut(auth).then(() => {
                 adminModal.style.display = "none";
@@ -289,7 +276,6 @@
             });
         });
 
-        // 6. SALVAR OU EDITAR ADDON
         document.getElementById('addonForm').addEventListener('submit', (e) => {
             e.preventDefault();
             if(!currentUser) return alert("Você precisa estar logado!");
@@ -311,7 +297,6 @@
             limparFormulario();
         });
 
-        // 7. RENDERIZAR LISTA NO PAINEL ADM
         function renderizarListaAdmin(data) {
             Object.keys(data).forEach(id => {
                 const addon = data[id];
