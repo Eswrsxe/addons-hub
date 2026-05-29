@@ -165,15 +165,22 @@
         import { getDatabase, ref, onValue, set, push, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-        // ⚠️ COLOQUE SUAS CREDENCIAIS DO FIREBASE AQUI
+    <!-- SCRIPTS DO FIREBASE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getDatabase, ref, onValue, set, push, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+        // SUAS CONFIGURAÇÕES REAIS DO FIREBASE
         const firebaseConfig = {
-            apiKey: "SUA_API_KEY",
-            authDomain: "SEU_PROJETO.firebaseapp.com",
-            databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
-            projectId: "SEU_PROJETO",
-            storageBucket: "SEU_PROJETO.appspot.com",
-            messagingSenderId: "SEU_SENDER",
-            appId: "SEU_APP_ID"
+            apiKey: "AIzaSyBpuO5PATbxK-ZlIKh859G02JXnEtTyAcI",
+            authDomain: "hub-addon.firebaseapp.com",
+            databaseURL: "https://hub-addon-default-rtdb.firebaseio.com",
+            projectId: "hub-addon",
+            storageBucket: "hub-addon.firebasestorage.app",
+            messagingSenderId: "226204582530",
+            appId: "1:226204582530:web:076e068b4aa50a46466a9b"
+            // measurementId foi omitido pois não usaremos o Analytics neste escopo básico
         };
 
         const app = initializeApp(firebaseConfig);
